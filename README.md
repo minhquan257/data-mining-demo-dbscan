@@ -13,6 +13,7 @@ Demo gồm hai cách sử dụng:
 | --- | --- |
 | `streamlit_app.py` | Website tương tác trực quan hoá DBSCAN ở 2D hoặc 3D. |
 | `dbscan_demo.py` | Chương trình dòng lệnh tạo dữ liệu, chạy DBSCAN và vẽ biểu đồ. |
+| `make_moons.csv` | Dữ liệu Make Moons gồm hai cụm cong lồng nhau. |
 | `make-circles.ipynb` | Notebook minh hoạ/tạo cấu hình dữ liệu Make Circles. |
 | `requirements.txt` | Danh sách thư viện Python cần cài. |
 
@@ -67,7 +68,7 @@ python dbscan_demo.py --dataset blobs --eps 0.35 --min-samples 5 --save dbscan_b
 
 Các bộ dữ liệu hỗ trợ là `moons`, `circles` và `blobs`.
 
-> Lưu ý: dataset `moons` cần tệp `archive.zip` chứa `make_moons.csv` nằm cùng thư mục với `dbscan_demo.py`. Tệp này được `.gitignore` bỏ qua nên không có trên GitHub; hãy tự đặt tệp dữ liệu vào thư mục project trước khi chạy `--dataset moons` hoặc chọn Make Moons trên website. Hai dataset `circles` và `blobs` được tạo trực tiếp bằng mã nguồn nên không cần tệp này.
+Dataset `moons` đọc trực tiếp tệp `make_moons.csv` trong repository. Hai dataset `circles` và `blobs` được tạo trực tiếp bằng mã nguồn.
 
 ## Cách đọc kết quả
 

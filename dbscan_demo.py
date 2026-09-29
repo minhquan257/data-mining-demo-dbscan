@@ -10,7 +10,6 @@ from __future__ import annotations
 import argparse
 from dataclasses import dataclass
 from pathlib import Path
-from zipfile import ZipFile
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -44,16 +43,13 @@ def make_data(name: str, seed: int, dimensions: int = 3) -> DemoData:
     if dimensions not in (2, 3):
         raise ValueError("dimensions chỉ có thể là 2 hoặc 3.")
     if name == "moons":
-        # Dùng chính dữ liệu người dùng cung cấp: archive.zip/make_moons.csv.
-        archive_path = Path(__file__).with_name("archive.zip")
-        if not archive_path.exists():
+        data_path = Path(__file__).with_name("make_moons.csv")
+        if not data_path.exists():
             raise FileNotFoundError(
-                f"Không tìm thấy {archive_path.name}. Hãy đặt tệp cạnh dbscan_demo.py."
+                f"Không tìm thấy {data_path.name}. Hãy đặt tệp cạnh dbscan_demo.py."
             )
-        with ZipFile(archive_path) as archive:
-            with archive.open("make_moons.csv") as csv_file:
-                points = np.loadtxt(csv_file, delimiter=",", skiprows=1, usecols=(0, 1))
-        title = "Make Moons — archive.zip/make_moons.csv"
+        points = np.loadtxt(data_path, delimiter=",", skiprows=1, usecols=(0, 1))
+        title = "Make Moons — make_moons.csv"
     elif name == "circles":
         points, _ = make_circles(
             n_samples=1000, noise=0.03, random_state=seed

@@ -172,7 +172,7 @@ if source == "Dữ liệu mẫu":
     dataset = st.selectbox(
         "Chọn bộ dữ liệu",
         {
-            "Make Moons — archive.zip/make_moons.csv": "moons",
+            "Make Moons — make_moons.csv": "moons",
             "Make Circles — make-circles.ipynb": "circles",
             "Blobs — cụm cầu có điểm nhiễu": "blobs",
         },
@@ -249,7 +249,7 @@ with st.expander("Cách đọc kết quả"):
 st.markdown("### Ba bộ dữ liệu trong demo")
 st.markdown(
     """
-    1. **Make Moons**: đọc trực tiếp `make_moons.csv` trong `archive.zip`; hai cụm cong lồng nhau.
+    1. **Make Moons**: đọc từ `make_moons.csv`; hai cụm cong lồng nhau.
     2. **Make Circles**: dùng cấu hình từ `make-circles.ipynb` — 1.000 điểm, `noise=0.03`.
     3. **Blobs**: ba cụm hình cầu cùng các điểm rải rác để quan sát nhãn noise (`-1`).
     """
