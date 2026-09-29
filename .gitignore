@@ -1,0 +1,10 @@
+# Archives
+/archive.zip
+
+# Python bytecode and local environments (installed libraries)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+ENV/
