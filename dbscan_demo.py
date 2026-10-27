@@ -19,11 +19,14 @@ from sklearn.metrics import silhouette_score
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import StandardScaler
 
+from density_examples import DENSITY_EXAMPLES, make_density_example
+
 
 @dataclass
 class DemoData:
     points: np.ndarray
     title: str
+    true_labels: np.ndarray | None = None
 
 
 def embed_in_3d(points: np.ndarray, seed: int) -> np.ndarray:
@@ -39,10 +42,14 @@ def embed_in_3d(points: np.ndarray, seed: int) -> np.ndarray:
 
 
 def make_data(name: str, seed: int, dimensions: int = 3) -> DemoData:
-    """Nạp/tạo một trong ba bộ dữ liệu để chạy DBSCAN ở 2D hoặc 3D."""
+    """Nạp/tạo dữ liệu phân cụm ở 2D hoặc 3D."""
     if dimensions not in (2, 3):
         raise ValueError("dimensions chỉ có thể là 2 hoặc 3.")
-    if name == "moons":
+    true_labels = None
+    if name in DENSITY_EXAMPLES:
+        points, true_labels = make_density_example(name, seed)
+        title = DENSITY_EXAMPLES[name]["name"]
+    elif name == "moons":
         data_path = Path(__file__).with_name("make_moons.csv")
         if not data_path.exists():
             raise FileNotFoundError(
@@ -55,6 +62,12 @@ def make_data(name: str, seed: int, dimensions: int = 3) -> DemoData:
             n_samples=1000, noise=0.03, random_state=seed
         )
         title = "Make Circles — make-circles.ipynb"
+    elif name == "variable_density":
+        points, _ = make_blobs(
+            n_samples=[180, 180, 180], centers=[(-3, -1), (0, 2), (3, -1)],
+            cluster_std=[0.15, 0.45, 0.9], random_state=seed,
+        )
+        title = "Ba cụm có mật độ khác nhau"
     else:
         points, _ = make_blobs(
             n_samples=460,
@@ -72,7 +85,7 @@ def make_data(name: str, seed: int, dimensions: int = 3) -> DemoData:
         title = f"{title} (nhúng 3D)"
     else:
         title = f"{title} (2D gốc)"
-    return DemoData(StandardScaler().fit_transform(points), title)
+    return DemoData(StandardScaler().fit_transform(points), title, true_labels)
 
 
 def k_distance(points: np.ndarray, min_samples: int) -> np.ndarray:
@@ -185,7 +198,7 @@ def plot_result(data: DemoData, eps: float, min_samples: int, save: str | None) 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Demo và trực quan DBSCAN")
     parser.add_argument(
-        "--dataset", choices=("moons", "circles", "blobs"), default="moons"
+        "--dataset", choices=("moons", "circles", "blobs", "variable_density", *DENSITY_EXAMPLES), default="moons"
     )
     parser.add_argument("--eps", type=float, default=0.35, help="Bán kính lân cận")
     parser.add_argument(
