@@ -10,6 +10,15 @@ from optics_demo import EXTRACTION_XI, compute_structure, extract_labels
 
 
 class OpticsStructureTests(unittest.TestCase):
+    def test_xi_slider_endpoints_return_labels(self):
+        points = np.random.RandomState(42).normal(size=(60, 2))
+        graph = compute_structure(points, 5)
+        for xi in (0.0, 0.1, 1.0):
+            with self.subTest(xi=xi):
+                labels = extract_labels(graph, 5, xi=xi, min_cluster_size=0.1)
+                self.assertEqual(labels.shape, (len(points),))
+                self.assertTrue(np.issubdtype(labels.dtype, np.integer))
+
     def test_explicit_extraction_matches_sklearn_defaults_without_mutating_structure(self):
         points = make_data("blobs", 42, 2).points
         graph = compute_structure(points, 5)

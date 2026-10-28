@@ -44,9 +44,11 @@ def extract_labels(structure: OpticsStructure, min_samples: int, *,
         )
     if method != "xi":
         raise ValueError("method chỉ có thể là xi hoặc dbscan.")
+    # scikit-learn divides by (1 - xi); approximate the upper endpoint.
+    effective_xi = float(np.nextafter(1.0, 0.0)) if xi == 1.0 else xi
     labels, _ = cluster_optics_xi(
         reachability=structure.reachability, predecessor=structure.predecessor,
         ordering=structure.ordering, min_samples=min_samples,
-        min_cluster_size=min_cluster_size, xi=xi, predecessor_correction=True,
+        min_cluster_size=min_cluster_size, xi=effective_xi, predecessor_correction=True,
     )
     return labels

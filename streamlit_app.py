@@ -197,11 +197,11 @@ def fit_optics_graph(points: np.ndarray, min_samples: int):
 
 @st.cache_data(show_spinner=False)
 def fit_optics(points: np.ndarray, min_samples: int, method: str,
-               xi: float, cut_eps: float, min_cluster_size: float):
+               xi: float, cut_eps: float):
     model, graph_ms = fit_optics_graph(points, min_samples)
     started = perf_counter()
     labels = extract_labels(model, min_samples, method=method, xi=xi,
-                            eps=cut_eps, min_cluster_size=min_cluster_size)
+                            eps=cut_eps, min_cluster_size=None)
     return model, labels, graph_ms + (perf_counter() - started) * 1000
 
 
@@ -245,7 +245,7 @@ def apply_density_preset(name: str) -> None:
         "display_mode": "2D", "min_samples": preset["min_samples"],
         "dbscan_eps": preset["eps"],
         "hdbscan_min_cluster_size": 20,
-        "optics_method": "xi", "optics_xi": 0.10, "optics_min_cluster_size": 0.10,
+        "optics_method": "xi", "optics_xi": 0.10,
     })
 
 
@@ -310,12 +310,12 @@ with optics_tab:
     optics_method = st.radio("Bước 2 — cách trích cụm OPTICS", ["xi", "dbscan"],
                             format_func=lambda value: "Xi — theo độ dốc" if value == "xi" else "Cắt ngang ε′",
                             horizontal=True, key="optics_method")
-    optics_xi, optics_cut, optics_size = EXTRACTION_XI, 1.5, .10
+    optics_xi, optics_cut = EXTRACTION_XI, 1.5
     if optics_method == "xi":
-        optics_xi = st.slider("ξ — ngưỡng độ dốc khi trích cụm", .01, .20, .10, .01, key="optics_xi")
-        optics_size = st.slider("Kích thước cụm tối thiểu khi trích Xi — tỷ lệ số điểm",
-                                .01, .50, .10, .01, key="optics_min_cluster_size")
-        st.caption("ξ mặc định 0.1 như trang 47. Kích thước cụm là tiêu chí trích nhãn, không phải tham số dựng ordering.")
+        optics_xi = st.slider("ξ — ngưỡng độ dốc khi trích cụm", 0.0, 1.0, .10, .01, key="optics_xi")
+        if optics_xi == 1.0:
+            st.caption("Ở ξ = 1, phép tính dùng giá trị sát 1 để tránh chia cho 0.")
+        st.caption(f"ξ mặc định 0.1 như trang 47. Kích thước cụm tối thiểu tự dùng MinPts = {min_samples} điểm.")
     else:
         optics_cut = st.slider("ε′ — mức cắt OPTICS (không phải eps DBSCAN)", .01, 3., .9, .01, key="optics_cut")
         st.caption("Như trang 45–46: điểm vượt ε′ mở cụm mới nếu core-distance ≤ ε′, nếu không thì là noise. Gần DBSCAN, không đảm bảo giống hệt ở border.")
@@ -332,7 +332,7 @@ with hdbscan_tab:
 with st.spinner("Đang chạy DBSCAN, OPTICS và HDBSCAN…"):
     dbscan, dbscan_ms = fit_dbscan(data.points, eps, min_samples)
     optics, optics_labels, optics_ms = fit_optics(
-        data.points, min_samples, optics_method, optics_xi, optics_cut, optics_size,
+        data.points, min_samples, optics_method, optics_xi, optics_cut,
     )
     hdbscan, hdbscan_ms = fit_hdbscan(data.points, min_samples, hdbscan_min_cluster_size)
     db_metrics = clustering_metrics(data.points, dbscan.labels_)
@@ -409,7 +409,7 @@ with optics_tab:
 
 with compare_tab:
     st.caption(f"Cùng {len(data.points)} điểm, {dimensions} chiều, StandardScaler, min_samples={min_samples}.")
-    extraction_text = f"xi={optics_xi:.2f}, kích thước cụm≥{optics_size:.0%}" if optics_method == "xi" else f"ε′={optics_cut:.2f}"
+    extraction_text = f"xi={optics_xi:.2f}, kích thước cụm≥{min_samples} điểm (MinPts)" if optics_method == "xi" else f"ε′={optics_cut:.2f}"
     st.caption(f"DBSCAN: eps={eps:.2f} · {optics_name}: {extraction_text} · HDBSCAN: min_cluster_size={hdbscan_min_cluster_size}, EOM.")
     left, middle, right = st.columns(3)
     with left:
