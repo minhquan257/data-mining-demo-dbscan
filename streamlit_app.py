@@ -242,7 +242,7 @@ def hdbscan_figure(points: np.ndarray, labels: np.ndarray,
 def apply_density_preset(name: str) -> None:
     preset = DENSITY_EXAMPLES[name]
     st.session_state.update({
-        "display_mode": "2D", "seed": 42, "min_samples": preset["min_samples"],
+        "display_mode": "2D", "min_samples": preset["min_samples"],
         "dbscan_eps": preset["eps"],
         "hdbscan_min_cluster_size": 20,
         "optics_method": "xi", "optics_xi": 0.10, "optics_min_cluster_size": 0.10,
@@ -266,7 +266,8 @@ st.caption("Ở 3D: kéo để xoay, lăn chuột để phóng to. Rê chuột l
 with st.sidebar:
     st.header("Thiết lập")
     display_mode = st.radio("Chế độ phân cụm và hiển thị", ("2D", "3D"), horizontal=True, key="display_mode")
-    seed = st.number_input("Random seed", min_value=0, value=42, step=1, key="seed")
+
+seed = 42
 
 dimensions = int(display_mode[0])
 
@@ -284,9 +285,9 @@ dataset_purpose = {
 st.caption(dataset_purpose[dataset])
 if dataset in DENSITY_EXAMPLES:
     st.info(DENSITY_EXAMPLES[dataset]["description"])
-    st.button("Áp dụng cấu hình thuyết trình (2D, seed 42)",
+    st.button("Áp dụng cấu hình thuyết trình (2D)",
               on_click=apply_density_preset, args=(dataset,))
-    st.caption("Cấu hình đã kiểm tra sau StandardScaler ở 2D, seed 42. Đổi seed, số chiều hoặc tham số có thể thay đổi kết quả.")
+    st.caption("Cấu hình đã kiểm tra sau StandardScaler ở 2D. Đổi số chiều hoặc tham số có thể thay đổi kết quả.")
     if dataset == "six_density":
         st.markdown("Nguồn cấu trúc dữ liệu: [ví dụ OPTICS của scikit-learn](https://scikit-learn.org/stable/auto_examples/cluster/plot_optics.html). Demo dùng seed và chuẩn hoá riêng.")
 try:
